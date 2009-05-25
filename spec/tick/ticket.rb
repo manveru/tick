@@ -140,4 +140,17 @@ describe Tick::Ticket do
     three.size.should == 1
     three.map(&:name).should == %w[3]
   end
+
+  it 'can be commented on' do
+    milestone = tick.create_milestone(name: 'having comments')
+
+    ticket = milestone.create_ticket(name: 'need comments')
+    ticket.create_comment(content: 'nothing important', author: 'manveru')
+
+    comments = ticket.comments
+    comments.size.should == 1
+    comment = comments.first
+    comment.content.should == 'nothing important'
+    comment.author.should == 'manveru'
+  end
 end

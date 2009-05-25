@@ -36,5 +36,19 @@ module Tick
 
       self
     end
+
+    def comments
+      ticket_tree = tree(path)
+      comments_tree = ticket_tree.tree(:comments)
+      comments_path = path/:comments
+
+      comments_tree.table.map do |key, value|
+        Comment.from(self, value)
+      end
+    end
+
+    def create_comment(*args)
+      Comment.create(self, *args)
+    end
   end
 end
