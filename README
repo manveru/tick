@@ -28,10 +28,8 @@ know every ticket tracker under the sun.
 
 == Dependencies
 
-Operation of Tick requires the `GitStore` and `JSON` libraries to be installed.
-JSON ships with Ruby since version 1.9, so in most cases you will not have to
-install it, there are API-compatible gems as pure ruby and as C-extension
-available, in most cases the C-extension should be preferred since it's faster.
+* Ruby >= 1.9.1
+* GitStore [http://github.com/georgi/git_store]
 
 == Storage
 
