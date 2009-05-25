@@ -100,7 +100,7 @@ module Tick
         store = parent.store
         store.transaction(message){ yield(store) }
       rescue => ex
-        p ex
+        puts ex, *ex.backtrace
       ensure
         store.refresh!
       end
