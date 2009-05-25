@@ -5,6 +5,7 @@ require 'pathname'
 require 'pp'
 require 'set'
 require 'time'
+require 'tmpdir'
 
 # 3rd party
 require 'git_store'
@@ -23,15 +24,8 @@ module Tick
 
   # TODO: create repo without relying on git?
   def git_init(path, message = 'tick init')
-    path = path.to_s
-    FileUtils.mkdir_p(path)
-
-    Dir.chdir path do
-      system('git', 'init') || return
-      File.open('.tick', 'w+'){|io| io.write(Date.today.to_s) }
-      system('git', 'add', '.tick')
-      system('git', 'commit', '-m', message.to_s)
-    end
+    ENV['GIT_DIR'] = path.to_s
+    system('git', 'init', '--bare', '--quiet') || return
   end
 
   def open(path, branch)
