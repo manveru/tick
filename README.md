@@ -1,8 +1,12 @@
-= Tick
+# Tick
 
 Tick is a distributed ticket tracking system hosted inside a Git repo.
 
-== Overview
+* The source can be found at [GitHub](http://github.com/manveru/tick)
+* Documentation will be hosted at [Rubyists](http://doc.rubyists.com/tick)
+
+
+## Overview
 
 Distributed ticket tracking is still a very experimental field with little
 common practice.
@@ -32,7 +36,7 @@ aspects of Tick might become plugins (like comments or attachments) to blaze
 the trail for future additions.
 
 
-== Integration
+## Integration
 
 I will try to provide integration with other ticket systems by working on
 synchronization features, this area will need most contribution as I do not
@@ -42,16 +46,16 @@ Tick works very well in bare git repos, which makes it small, fast, and
 efficient in an hosting-environment as well.
 
 
-== Dependencies
+## Dependencies
 
-* Ruby >= 1.9.1
-* GitStore - can be found at: http://github.com/georgi/git_store
+* Ruby greater or equal to 1.9.1
+* GitStore can be found at: [GitHub](http://github.com/georgi/git_store)
 
 In future I might make the source compatible with 1.8.x, but that's rather low
 priority for now.
 
 
-== Todo
+## Todo
 
 There are several areas where Tick still needs improvement, first of all we
 should track down the most obvious performance issues, as I haven't done
@@ -73,41 +77,63 @@ Various things that need to be done:
 * Porting to Ruby 1.8.6
 
 
-== Storage
+## Storage
 
-Every 'object' in Tick is stored as a directory containing its properties. So
+Every `object` in Tick is stored as a directory containing its properties. So
 every Tick repository is structured as a tree.
 
-An example might look like following, the type in square brackets.
+An example might look like following, the type in parenthesis.
 
-  project/tick [repo/branch]
-    Milestone-d848c9713eb1c248d99ae01d257fe9b269623d27 [Milestone tree]
-      author        [string property]
-      creation_time [time property]
-      description   [string property]
-      name          [string property]
-      status        [string property]
-      target_date   [time property]
-      tickets       [tree]
-        Ticket-8843d7f92416211de9ebb963ff4ce28125932878 [Ticket tree]
-          tags    [set property]
-          title   [string property]
-          content [string property]
-          author  [string property]
-          comments [tree]
-            Comment-0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33 [Comment tree]
-              author  [string property]
-              content [string property]
-            Comment-62cdb7020ff920e5aa642c3d4066950dd1f01f4d [Comment tree]
-              author  [string property]
-              content [string property]
-          attachments [relation]
-            Attachment-8b42d3bfacdcc29b89c5bc992201e9e2ad507625 [Comment tree]
-              author [string property]
-              content [string property]
-            Attachment-5c8e2c226c34d17820c2dbc723394c41936afc75 [Comment tree]
-              author [string property]
-              content [string property]
+    project/tick (repo/branch)
+      Milestone-9ab2beb1b0fd505da3a5f2937952a21ab3e1124a (Milestone tree)
+        tickets (tree)
+          Ticket-aba3fa7a3d641acc937a3c4724b7094f56309c00 (Ticket tree)
+            comments (tree)
+              Comment-78d3210fe31a80d6f18ac157496f76378f13b3aa (Comment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+              Comment-63e244b02a26e441c41fdc49cf4dbb1cc41b9e92 (Comment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+            attachments (tree)
+              Attachment-ee40e7bad30ff04b9dc1b97a316ed52116c83520 (Attachment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+              Attachment-255884ff1585af21cbc6536bd11c55000b62e550 (Attachment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+          Ticket-ed1f26bb991b72ccc762eeea3482fd9015aa08d8 (Ticket tree)
+            comments (tree)
+              Comment-d32676cf6dc77713bf3eb7dea83072625f9cd15b (Comment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+              Comment-2e805f08f62546de0d607e803b29066815ba0aa2 (Comment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+            attachments (tree)
+              Attachment-51443bd9e9931bd7ec67e50974137a5dc7960c0d (Attachment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+              Attachment-3136124ff5f50311bc21402d92f4b30c84466a68 (Attachment tree)
+                created_at (time property)
+                updated_at (time property)
+                author (string property)
+                content (string property)
+
 
 As you can see, at the root of the repository are multiple directories
 representing milestones, which contains property-files and a tickets-directory.
@@ -131,15 +157,15 @@ parsing a representation that would be more human-readable.
 Of course it is still possible to edit properties manually, but this should be
 done with great care and avoided if possible.
 
-=== GitStore Objects
+### GitStore Objects
 
-Our so-called GitStore objects are the foundation of Tick, they abstract the
+Our so-called GitStore-objects are the foundation of Tick, they abstract the
 direct interaction with Git to a minimum and let you concentrate on the real
 issue at hand.
 
 
 
-=== Milestone
+### Milestone
 
 A milestone has following properties:
 
@@ -150,7 +176,7 @@ A milestone has following properties:
 * Status (open, closed)
 * Description
 
-=== Ticket
+### Ticket
 
 Every ticket belongs to one milestone.
 
@@ -164,13 +190,13 @@ A Ticket has following properties:
 * Description
 * Tags
 
-==== Tags
+#### Tags
 
 Tags can be arbitrary Unicode strings, but may not contain the ',' character
 and any padding spaces. This is not a limitation of Tick itself, but rather of
 the various commands that will manipulate tags.
 
-=== Property types
+### Property types
 
 In order to simplify serialization to JSON, every property is given a specific
 type, which defaults to `:string`.
@@ -179,19 +205,19 @@ Following is a list of currently available types and their JSON representation.
 Please note that the number of types is very restricted, but based on the YAGNI
 principle we will only introduce new ones as needed.
 
-==== String
+#### String
 
 The `:string` type is represented as the value within a Hash, the key is the
 name of the property.
 
 For example `Ticket#author` is serialized to:
 
-  {
-    "author": "manveru"
-  }
+    {
+      "author": "manveru"
+    }
 
 
-==== Time
+#### Time
 
 The `:time` type is represented as a Fixnum value within a Hash, the key is the
 name of the property. The Fixnum is the result of `Time.to_i`, which can be
@@ -202,12 +228,12 @@ issue.
 
 For example `Ticket#created_at` is serialized to:
 
-  {
-    "created_at": 1243245019
-  }
+    {
+      "created_at": 1243245019
+    }
 
 
-==== Set
+#### Set
 
 The `:set` type is represented as an ordered Array without another enclosure.
 It may not contain duplicate values, they will be discarded on every round
@@ -215,9 +241,9 @@ trip.
 
 For example `Ticket#tags` is serialized to:
 
-  [
-    "git",
-    "tick",
-    "ticket",
-    "tracking"
-  ]
+    [
+      "git",
+      "tick",
+      "ticket",
+      "tracking"
+    ]
