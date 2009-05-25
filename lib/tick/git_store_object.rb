@@ -34,7 +34,6 @@ module Tick
       TYPES = {
         :created_at => :time,
         :updated_at => :time,
-        :tags => :set,
         :parent => :skip,
       }
 

@@ -17,6 +17,8 @@ module Tick
     include GitStoreObject::InstanceMethods
     extend GitStoreObject::SingletoneMethods
 
+    TYPES[:tags] = :set
+
     alias milestone parent
 
     def generate_path
