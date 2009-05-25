@@ -142,7 +142,7 @@ describe Tick::Ticket do
   end
 
   it 'can be commented on' do
-    milestone = tick.create_milestone(name: 'having comments')
+    milestone = tick.create_milestone(name: 'have a comment')
 
     ticket = milestone.create_ticket(name: 'need comments')
     ticket.create_comment(content: 'nothing important', author: 'manveru')
@@ -152,5 +152,18 @@ describe Tick::Ticket do
     comment = comments.first
     comment.content.should == 'nothing important'
     comment.author.should == 'manveru'
+  end
+
+  it 'can have multiple comments' do
+    milestone = tick.create_milestone(name: 'have comments')
+
+    ticket = milestone.create_ticket(name: 'need comments')
+
+    ticket.create_comment(content: '1', author: 'manveru')
+    ticket.create_comment(content: '2', author: 'manveru')
+    ticket.create_comment(content: '3', author: 'manveru')
+
+    comments = ticket.comments
+    comments.size.should == 3
   end
 end
