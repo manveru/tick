@@ -2,6 +2,14 @@ module Tick
   # Some extensions for Pathname, keeping it in Tick module for squeaky clean
   # code.
   class Pathname < ::Pathname
+    def self.tmpdir
+      new(Dir.tmpdir)
+    end
+
+    def rm_rf
+      FileUtils.rm_rf(to_s)
+    end
+
     def /(other)
       join(other.to_s)
     end

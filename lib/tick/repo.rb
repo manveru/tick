@@ -4,7 +4,7 @@ module Tick
 
     def initialize(path, branch = 'tick')
       @path, @branch = path, branch
-      @store = GitStore.new(path.to_s, branch)
+      @store = GitStore.new(path.to_s, branch, bare = true)
       @store.refresh! # make sure we have latest data
       # @store.handler['tick'] = TicketHandler.new
     end
