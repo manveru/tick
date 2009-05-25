@@ -81,5 +81,19 @@ module Tick
     ensure
       store.refresh!
     end
+
+    # select tickets that match all of the criteria given
+    # if a block is given, it will be used for selection instead.
+    def select(criteria = {}, &block)
+      if block_given?
+        tickets.select(&block)
+      else
+        tickets.select do |ticket|
+          criteria.all? do |key, value|
+            ticket[key] == value
+          end
+        end
+      end
+    end
   end
 end

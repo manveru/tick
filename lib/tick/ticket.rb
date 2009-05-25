@@ -38,6 +38,15 @@ module Tick
       @path = milestone.path/"tickets/Ticket-#{sha1}"
     end
 
+    def update(hash = {})
+      hash.each{|key, value| self[key] = value }
+      save
+    end
+
+    def inspect
+      to_hash.inspect
+    end
+
     def save
       self.updated_at = Time.now
 
@@ -50,9 +59,11 @@ module Tick
           type = TYPES[member]
           next if type == :skip
 
-          ticket_tree[member] = dump(type, member)
+          ticket_tree[member.to_s] = dump(type, member)
         end
       end
+
+      self
     end
   end
 end
