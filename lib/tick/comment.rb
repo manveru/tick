@@ -1,5 +1,5 @@
 module Tick
-  Comment = Struct.new(*(COMMON_MEMBERS + [:author, :content]))
+  Comment = Struct.new(*COMMON_MEMBERS, :author, :content)
 
   class Comment
     include GitStoreObject::InstanceMethods
@@ -14,7 +14,7 @@ module Tick
     def save
       self.updated_at = Time.now
 
-      parent.transaction 'Updating Ticket' do |store|
+      parent.transaction 'Updating Comment' do |store|
         ticket_tree = store.tree(parent.path)
         comments_tree = ticket_tree.tree(:comments)
         comment_tree = comments_tree.tree(path.basename)

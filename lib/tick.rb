@@ -18,9 +18,11 @@ require 'tick/json_handler'
 require 'tick/repo'
 require 'tick/milestone'
 require 'tick/ticket'
-require 'tick/comment'
 
 module Tick
+  autoload :Comment, 'tick/comment'
+  autoload :Attachment, 'tick/attachment'
+
   module_function
 
   # TODO: create repo without relying on git?

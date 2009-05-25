@@ -1,5 +1,5 @@
 module Tick
-  Milestone = Struct.new(*(COMMON_MEMBERS + [:name, :status, :description]))
+  Milestone = Struct.new(*COMMON_MEMBERS, :name, :status, :description)
 
   # Milestone is a named collection of tickets
   class Milestone
