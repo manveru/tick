@@ -4,21 +4,33 @@ Tick is a distributed ticket tracking system hosted inside a Git repo.
 
 == Overview
 
-Distributed ticket tracking is still a very experimental field with little common practice.
+Distributed ticket tracking is still a very experimental field with little
+common practice.
+
 Tick tries to tackle the problem in a simple manner, that is distinct from the
 well-known ditz and ticgit ticket trackers or the way fossil handles it.
 
 The approach tries to take the best properties of the current solutions and
 distill them to something much easier to approach.
-Two properties that have high priority is portability and fidelity of ticket data and speed.
+Two properties that have high priority is portability and fidelity of ticket
+data and speed.
 Given that this tries to be a git-based ticket-tracker, we will take advantage
 of using a separate branch, but will do so in a manner that makes concurrent
 access possible.
 All of these features will have more impact on disk space than on memory usage,
-and I think this is a reasonable tradeoff as most ticket trackers have a low
+and I think this is a reasonable trade-off as most ticket trackers have a low
 amount of data but need to work as fast as possible.
 It is also important that graphical, CLI, or web-frontends do not lock the
-repository they operate on, but rather operate atomically while ensuring integrity.
+repository they operate on, but rather operate atomically while ensuring
+integrity.
+
+The source of Tick is intended to be very readable and easy to extend to
+accommodate people who would like to create additional functionality.
+
+I do not intend to add any plugin facilities yet, but eventually some core
+aspects of Tick might become plugins (like comments or attachments) to blaze
+the trail for future additions.
+
 
 == Integration
 
@@ -26,13 +38,40 @@ I will try to provide integration with other ticket systems by working on
 synchronization features, this area will need most contribution as I do not
 know every ticket tracker under the sun.
 
+Tick works very well in bare git repos, which makes it small, fast, and
+efficient in an hosting-environment as well.
+
+
 == Dependencies
 
 * Ruby >= 1.9.1
-* GitStore [http://github.com/georgi/git_store]
+* GitStore - can be found at: http://github.com/georgi/git_store
 
 In future I might make the source compatible with 1.8.x, but that's rather low
 priority for now.
+
+
+== Todo
+
+There are several areas where Tick still needs improvement, first of all we
+should track down the most obvious performance issues, as I haven't done
+profiling yet.
+
+Plans for the future frontends are:
+
+* CLI
+* Shoes and Curses GUI
+* Ramaze or Innate web application
+* Static website generation to serve snapshots
+
+Various things that need to be done:
+
+* More specs
+* YARD docs
+* Tutorial
+* Instructions for distributed usage
+* Porting to Ruby 1.8.6
+
 
 == Storage
 
@@ -42,61 +81,63 @@ every Tick repository is structured as a tree.
 An example might look like following, the type in square brackets.
 
   project/tick [repo/branch]
-    Milestone-d848c9713eb1c248d99ae01d257fe9b269623d27 [Milestone]
-      author        [property]
-      creation_time [property]
-      description   [property]
-      name          [property]
-      status        [property]
-      target_date   [property]
-      tickets       [property]
-        Ticket-8843d7f92416211de9ebb963ff4ce28125932878 [Ticket]
-          tags    [property]
-          title   [property]
-          content [property]
-          author  [property]
-          comments [property]
-            Comment-0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33 [Comment]
-              author  [property]
-              content [property]
-            Comment-62cdb7020ff920e5aa642c3d4066950dd1f01f4d [Comment]
-              author  [property]
-              content [property]
+    Milestone-d848c9713eb1c248d99ae01d257fe9b269623d27 [Milestone tree]
+      author        [string property]
+      creation_time [time property]
+      description   [string property]
+      name          [string property]
+      status        [string property]
+      target_date   [time property]
+      tickets       [tree]
+        Ticket-8843d7f92416211de9ebb963ff4ce28125932878 [Ticket tree]
+          tags    [set property]
+          title   [string property]
+          content [string property]
+          author  [string property]
+          comments [tree]
+            Comment-0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33 [Comment tree]
+              author  [string property]
+              content [string property]
+            Comment-62cdb7020ff920e5aa642c3d4066950dd1f01f4d [Comment tree]
+              author  [string property]
+              content [string property]
+          attachments [relation]
+            Attachment-8b42d3bfacdcc29b89c5bc992201e9e2ad507625 [Comment tree]
+              author [string property]
+              content [string property]
+            Attachment-5c8e2c226c34d17820c2dbc723394c41936afc75 [Comment tree]
+              author [string property]
+              content [string property]
 
-Tickets are stored in a tree, when creating a new ticket, a directory is
-created for it, named after the SHA1 checksum of its initial contents.
+As you can see, at the root of the repository are multiple directories
+representing milestones, which contains property-files and a tickets-directory.
 
-Tickets are further nested inside milestone directories, every milestone
-directory may also have properties inside the directory, and is named after the
-SHA1 checksum of the initial contents.
-Initially, there will be one milestone called 'future', which will receive
-tickets by default unless another milestone is checked out or passed as
-argument on ticket creation.
-Tickets can also be moved between open milestones.
+All directories are named by hashing the initial contents, this ensures that
+distributed creation of identical objects can be merged without problems.
 
-This directory acts as container for any further changes to the ticket.
+Every property of objects is stored in a separate files to further minimize
+merging conflicts, in future we will also have an automatic merging strategy
+that will take care of the most common conflicts like changing ticket status or
+identical tickets moving between milestones.
 
-In order to ensure fidelity of data and cross-platform compatibility, we will
-not store the actual data inside the filename, as ticgit does.
-
-Every property of a ticket is given one file with the contents serialized to
-JSON. JSON is chosen because it is significantly faster than YAML (which ditz
-uses) and can be parsed easily in just about every programming language since
-the structure is much simpler.
-
-In order to minimize merge conflicts, I will keep every property of a ticket in
-a separate file, following part of the ticgit convention for naming the file.
-
-On the first access to a ticket, the properties will be merged down into a
-single nested JSON representation that is stored outside of the repository,
-which will be updated when modifications are made, this allows us to keep
-access time fast without having read a lot of files, while keeping the tree as
-basis for modifications to avoid conflicts.
-Usually these merge-files will be stored in `Dir.tmpdir`.
+Every property is stored as JSON to give fast and easy interoperability between
+programming languages and to keep data fidelity high. We do not use YAML since
+that is comparatively slow and provides too many types and features that we
+don't need.
 
 You might have noticed that the tree is not meant to be edited by hand, but is
 fully tuned to fast and precise machine modification that avoids the impact of
-parsing a represenation that would be more human-readable.
+parsing a representation that would be more human-readable.
+Of course it is still possible to edit properties manually, but this should be
+done with great care and avoided if possible.
+
+=== GitStore Objects
+
+Our so-called GitStore objects are the foundation of Tick, they abstract the
+direct interaction with Git to a minimum and let you concentrate on the real
+issue at hand.
+
+
 
 === Milestone
 
@@ -125,7 +166,7 @@ A Ticket has following properties:
 
 ==== Tags
 
-Tags can be arbitrary unicode strings, but may not contain the ',' character
+Tags can be arbitrary Unicode strings, but may not contain the ',' character
 and any padding spaces. This is not a limitation of Tick itself, but rather of
 the various commands that will manipulate tags.
 
@@ -169,4 +210,14 @@ For example `Ticket#created_at` is serialized to:
 ==== Set
 
 The `:set` type is represented as an ordered Array without another enclosure.
-It may not contain duplicate values, they will be discared on every roundrip.
+It may not contain duplicate values, they will be discarded on every round
+trip.
+
+For example `Ticket#tags` is serialized to:
+
+  [
+    "git",
+    "tick",
+    "ticket",
+    "tracking"
+  ]
