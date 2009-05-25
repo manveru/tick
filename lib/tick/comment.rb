@@ -8,7 +8,7 @@ module Tick
     alias ticket parent
 
     def generate_path
-      parent.path/"comments/Comment-#{sha1}"
+      @path = parent.path/"comments/Comment-#{sha1}"
     end
 
     def save

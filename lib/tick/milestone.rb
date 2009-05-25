@@ -9,7 +9,7 @@ module Tick
     alias repo parent
 
     def generate_path
-      Tick::Pathname("Milestone-#{sha1}")
+      @path = Tick::Pathname("Milestone-#{sha1}")
     end
 
     # This should be lazier...

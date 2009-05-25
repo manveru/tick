@@ -3,6 +3,58 @@ require 'spec/helper'
 describe Tick::Ticket do
   behaves_like :tick
 
+  it 'can have everything' do
+    milestone = tick.create_milestone(name: 'milestone')
+    ticket0 = milestone.create_ticket(name: 'ticket 0')
+    comment01 = ticket0.create_comment(content: 'comment 01')
+    comment02 = ticket0.create_comment(content: 'comment 02')
+    attachment01 = ticket0.create_attachment(content: 'attachment 01')
+    attachment02 = ticket0.create_attachment(content: 'attachment 02')
+
+    ticket1 = milestone.create_ticket(name: 'ticket 1')
+    comment11 = ticket1.create_comment(content: 'comment 11')
+    comment12 = ticket1.create_comment(content: 'comment 12')
+    attachment11 = ticket1.create_attachment(content: 'attachment 11')
+    attachment12 = ticket1.create_attachment(content: 'attachment 12')
+
+    milestone.tickets.size.should == 2
+
+    milestone.tickets.each do |ticket|
+      ticket.comments.size.should == 2
+      ticket.attachments.size.should == 2
+    end
+
+=begin
+    puts
+    puts "#{milestone.path} (Milestone tree)"
+    puts "  tickets (tree)"
+
+    milestone.tickets.each do |ticket|
+    puts "    #{ticket.path.basename} (Ticket tree)"
+      ticket.comments.size.should == 2
+      ticket.attachments.size.should == 2
+
+    puts "      comments (tree)"
+      ticket.comments.each do |comment|
+    puts "        #{comment.path.basename} (Comment tree)"
+        comment.class.members.each do |member|
+          next if member == :parent
+    puts "          #{member} (#{comment.class::TYPES[member]} property)"
+        end
+      end
+
+    puts "      attachments (tree)"
+      ticket.attachments.each do |attachment|
+    puts "        #{attachment.path.basename} (Attachment tree)"
+        attachment.class.members.each do |member|
+          next if member == :parent
+    puts "          #{member} (#{attachment.class::TYPES[member]} property)"
+        end
+      end
+    end
+=end
+  end
+
   it 'creates a ticket' do
     milestone = tick.create_milestone(name: 'creating first ticket')
 
@@ -178,5 +230,15 @@ describe Tick::Ticket do
     attachment = attachments.first
     attachment.content.should == 'nothing important'
     attachment.author.should == 'manveru'
+  end
+
+  it 'has an identity that depends on the content' do
+    milestone = tick.create_milestone(name: 'shared identity')
+    ticket0 = milestone.create_ticket(name: 'ticket 0')
+    ticket1 = milestone.create_ticket(name: 'ticket 0')
+    ticket0.path.should == ticket1.path
+    sleep 1 # make sure the time has no influence on the checksum
+    ticket2 = milestone.create_ticket(name: 'ticket 0')
+    ticket2.path.should == ticket1.path
   end
 end

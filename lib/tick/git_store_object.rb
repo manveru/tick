@@ -10,6 +10,7 @@ module Tick
         properties = properties.merge(parent: parent)
         values = properties.values_at(*members)
         instance = new(*values)
+        instance.generate_path
         instance.save
         instance
       end
@@ -23,9 +24,11 @@ module Tick
           next if type == :skip
 
           value = hash[member.to_s]
+          next if value.nil?
           instance[member] = instance.parse(value, type, member)
         end
 
+        instance.generate_path
         instance
       end
     end
@@ -44,10 +47,12 @@ module Tick
       def initialize(*args)
         super
 
-        self.created_at ||= Time.now
-        self.updated_at ||= Time.now
+        self.created_at ||= Time.at(Time.now.to_i) # roundtrip to chop off
+        self.updated_at ||= Time.at(Time.now.to_i) # roundtrip to chop off
+      end
 
-        @path = generate_path
+      def generate_path
+        @path = super
       end
 
       def update(hash = {})
@@ -66,22 +71,21 @@ module Tick
       end
 
       def sha1
-        Digest::SHA1.hexdigest(to_hash.inspect)
+        id = (self.class.members - COMMON_MEMBERS).map{|member| self[member] }
+        Digest::SHA1.hexdigest(id.inspect)
       end
 
-      def dump(type, member)
-        # p :dump => [type, member]
+      def dump(value, type, member)
         case type
-        when :string; {member => self[member].to_s}
-        when :time;   {member => self[member].to_i}
-        when :set;    [*self[member]].uniq.sort
+        when :string; {member => value.to_s}
+        when :time;   {member => value.to_i}
+        when :set;    [*value].uniq.sort
         else
           raise("Unknown type for %p: %p" % [member, type])
         end
       end
 
       def parse(json, type, member)
-        # p :parse => [json, type, member]
         case type
         when :string; json[member.to_s]
         when :time;   Time.at(json[member.to_s])
@@ -115,7 +119,10 @@ module Tick
           type = types[member]
           next if type == :skip
 
-          tree[member] = dump(type, member)
+          value = self[member]
+          next if value.nil?
+
+          tree[member] = dump(value, type, member)
         end
       end
     end

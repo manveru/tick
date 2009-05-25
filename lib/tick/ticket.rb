@@ -22,7 +22,7 @@ module Tick
     alias milestone parent
 
     def generate_path
-      parent.path/"tickets/Ticket-#{sha1}"
+      @path = parent.path/"tickets/Ticket-#{sha1}"
     end
 
     def save
