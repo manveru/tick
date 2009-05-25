@@ -50,5 +50,19 @@ module Tick
     def create_comment(*args)
       Comment.create(self, *args)
     end
+
+    def attachments
+      ticket_tree = tree(path)
+      attachments_tree = ticket_tree.tree(:attachments)
+      attachments_path = path/:attachments
+
+      attachments_tree.table.map do |key, value|
+        Attachment.from(self, value)
+      end
+    end
+
+    def create_attachment(*args)
+      Attachment.create(self, *args)
+    end
   end
 end

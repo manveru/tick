@@ -166,4 +166,17 @@ describe Tick::Ticket do
     comments = ticket.comments
     comments.size.should == 3
   end
+
+  it 'can have an attachment' do
+    milestone = tick.create_milestone(name: 'have an attachment')
+
+    ticket = milestone.create_ticket(name: 'needs attachments')
+    ticket.create_attachment(content: 'nothing important', author: 'manveru')
+
+    attachments = ticket.attachments
+    attachments.size.should == 1
+    attachment = attachments.first
+    attachment.content.should == 'nothing important'
+    attachment.author.should == 'manveru'
+  end
 end
