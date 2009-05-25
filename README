@@ -35,8 +35,35 @@ available, in most cases the C-extension should be preferred since it's faster.
 
 == Storage
 
+Every 'object' in Tick is stored as a directory containing its properties. So
+every Tick repository is structured as a tree.
+
+An example might look like following, the type in square brackets.
+
+  project/tick [repo/branch]
+    Milestone-d848c9713eb1c248d99ae01d257fe9b269623d27 [Milestone]
+      author        [property]
+      creation_time [property]
+      description   [property]
+      name          [property]
+      status        [property]
+      target_date   [property]
+      tickets       [property]
+        Ticket-8843d7f92416211de9ebb963ff4ce28125932878 [Ticket]
+          tags    [property]
+          title   [property]
+          content [property]
+          author  [property]
+          comments [property]
+            Comment-0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33 [Comment]
+              author  [property]
+              content [property]
+            Comment-62cdb7020ff920e5aa642c3d4066950dd1f01f4d [Comment]
+              author  [property]
+              content [property]
+
 Tickets are stored in a tree, when creating a new ticket, a directory is
-created for it, named after the SHA1 checksum of its contents.
+created for it, named after the SHA1 checksum of its initial contents.
 
 Tickets are further nested inside milestone directories, every milestone
 directory may also have properties inside the directory, and is named after the
@@ -58,6 +85,17 @@ the structure is much simpler.
 
 In order to minimize merge conflicts, I will keep every property of a ticket in
 a separate file, following part of the ticgit convention for naming the file.
+
+On the first access to a ticket, the properties will be merged down into a
+single nested JSON representation that is stored outside of the repository,
+which will be updated when modifications are made, this allows us to keep
+access time fast without having read a lot of files, while keeping the tree as
+basis for modifications to avoid conflicts.
+Usually these merge-files are stored in `Dir.tmpdir`.
+
+You might have noticed that the tree is not meant to be edited by hand, but is
+fully tuned to fast and precise machine modification that avoids the impact of
+parsing a represenation that would be more human-readable.
 
 === Milestone
 

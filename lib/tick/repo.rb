@@ -4,19 +4,25 @@ module Tick
 
     def initialize(path, branch = 'tick')
       @path, @branch = path, branch
-      @store = GitStore.new(path, branch)
+      @store = GitStore.new(path.to_s, branch)
       @store.refresh! # make sure we have latest data
-      @store.handler['tick'] = TicketHandler.new
+      # @store.handler['tick'] = TicketHandler.new
     end
 
-    def tickets
-      all = []
+    def sanitize!
+      # make sure we have a future milestone
+      milestone = Milestone.new(:name => 'future')
+      FileUtils.mkdir_p(File.join(path, 'future'))
+    end
 
-      if tree = @store['tickets']
-        @store['tickets'].each{|file, ticket| all << ticket }
+    def milestones
+      store.root.table.keys.map do |key|
+        Milestone.open(self, key)
       end
+    end
 
-      all
+    def create_milestone(*args)
+      Milestone.create(self, *args)
     end
 
     def <<(ticket)
