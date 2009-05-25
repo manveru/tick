@@ -12,14 +12,14 @@ require 'git_store'
 
 $:.unshift(File.dirname(__FILE__))
 
-module Tick
-  autoload :Milestone,      'tick/milestone'
-  autoload :Pathname,       'tick/pathname'
-  autoload :Repo,           'tick/repo'
-  autoload :Ticket,         'tick/ticket'
-  autoload :TicketHandler,  'tick/ticket_handler'
-  autoload :GitStoreObject, 'tick/git_store_object'
+require 'tick/git_store_object'
+require 'tick/pathname'
+require 'tick/repo'
+require 'tick/milestone'
+require 'tick/ticket'
+require 'tick/comment'
 
+module Tick
   module_function
 
   # TODO: create repo without relying on git?
