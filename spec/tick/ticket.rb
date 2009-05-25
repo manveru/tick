@@ -3,6 +3,18 @@ require 'spec/helper'
 describe Tick::Ticket do
   behaves_like :tick
 
+  it 'creates a ticket' do
+    milestone = tick.create_milestone(name: 'creating first ticket')
+
+    milestone.create_ticket(name: 'first ticket', author: 'manveru')
+
+    tickets = milestone.tickets
+    tickets.size.should == 1
+    ticket = tickets.first
+    ticket.name.should == 'first ticket'
+    ticket.author.should == 'manveru'
+  end
+
   it 'creates some tickets' do
     milestone = tick.create_milestone(name: 'creating tickets')
 

@@ -1,4 +1,9 @@
 module Tick
+  COMMON_MEMBERS = [:parent, :created_at, :updated_at]
+
+  # This module contains the methods used by all our so-called git store objects.
+  # The classes using them will have to implement the `#save` and
+  # `#generate_path` methods in order for this to work.
   module GitStoreObject
     module SingletoneMethods
       def create(parent, properties = {})
@@ -46,6 +51,15 @@ module Tick
         @path = generate_path
       end
 
+      def update(hash = {})
+        hash.each{|key, value| self[key] = value }
+        save
+      end
+
+      def inspect
+        to_hash.inspect
+      end
+
       def to_hash
         hash = Hash[members.map{|member| [member, self[member]] }]
         hash.delete_if{|k,v| TYPES[k] == :skip }
@@ -82,6 +96,30 @@ module Tick
 
       def tree(*args)
         parent.tree(*args)
+      end
+
+      def transaction(message)
+        store = parent.store
+        store.transaction(message){ yield(store) }
+      rescue => ex
+        p ex
+      ensure
+        store.refresh!
+      end
+
+      def store
+        parent.store
+      end
+
+      def dump_into(tree)
+        types = self.class::TYPES
+
+        self.class.members.each do |member|
+          type = types[member]
+          next if type == :skip
+
+          tree[member] = dump(type, member)
+        end
       end
     end
   end

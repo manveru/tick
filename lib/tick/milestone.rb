@@ -1,18 +1,15 @@
 module Tick
-  Milestone = Struct.new(:parent, :name, :status, :description, :created_at,
-                         :updated_at)
+  Milestone = Struct.new(*(COMMON_MEMBERS + [:name, :status, :description]))
 
   # Milestone is a named collection of tickets
   class Milestone
     include GitStoreObject::InstanceMethods
     extend GitStoreObject::SingletoneMethods
 
-    PATH_PREFIX = "Milestone-"
-
     alias repo parent
 
     def generate_path
-      Tick::Pathname("#{PATH_PREFIX}#{sha1}")
+      Tick::Pathname("Milestone-#{sha1}")
     end
 
     # This should be lazier...
@@ -38,25 +35,12 @@ module Tick
 
     def save
       self.updated_at = Time.now
-      path = self.path
 
       transaction 'Updating Milestone' do |store|
-        tree = tree(path)
-
-        self.class.members.each do |member|
-          type = TYPES[member]
-          next if type == :skip
-
-          tree[member] = dump(type, member)
-        end
+        dump_into(tree(path))
       end
-    end
 
-    def transaction(message)
-      store = parent.store
-      store.transaction(message){ yield(store) }
-    ensure
-      store.refresh!
+      self
     end
 
     # select tickets that match all of the criteria given
