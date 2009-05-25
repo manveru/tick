@@ -16,9 +16,8 @@ module Tick
     end
 
     def milestones
-      tree = store.root
-      tree.table.keys.map do |key|
-        Milestone.open(self, tree, key)
+      store.root.table.map do |key, value|
+        Milestone.from(self, value)
       end
     end
 
