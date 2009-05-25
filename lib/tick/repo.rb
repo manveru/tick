@@ -5,6 +5,7 @@ module Tick
     def initialize(path, branch = 'tick')
       @path, @branch = path, branch
       @store = GitStore.new(path.to_s, branch, bare = true)
+      @store.handler.default = JSONHandler.new
       @store.refresh! # make sure we have latest data
       # @store.handler['tick'] = TicketHandler.new
     end

@@ -73,10 +73,10 @@ module Tick
       def dump(type, member)
         # p :dump => [type, member]
         case type
-        when :string; {member => self[member].to_s}.to_json
-        when :date;   {member => self[member].to_s}.to_json
-        when :time;   {member => self[member].to_i}.to_json
-        when :set;    [*self[member]].uniq.sort.to_json
+        when :string; {member => self[member].to_s}
+        when :date;   {member => self[member].to_s}
+        when :time;   {member => self[member].to_i}
+        when :set;    [*self[member]].uniq.sort
         else
           raise("Unknown type for %p: %p" % [member, type])
         end
@@ -85,10 +85,10 @@ module Tick
       def parse(json, type, member)
         # p :parse => [json, type, member]
         case type
-        when :string; JSON.parse(json)[member.to_s]
-        when :date;   Date.parse(JSON.parse(json)[member.to_s])
-        when :time;   Time.at(JSON.parse(json)[member.to_s])
-        when :set;    Set.new(JSON.parse(json))
+        when :string; json[member.to_s]
+        when :date;   Date.parse(json[member.to_s])
+        when :time;   Time.at(json[member.to_s])
+        when :set;    Set.new(json)
         else
           raise("Unknown type for %p: %p" % [member, type])
         end

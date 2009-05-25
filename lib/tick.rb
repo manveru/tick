@@ -14,6 +14,7 @@ $:.unshift(File.dirname(__FILE__))
 
 require 'tick/git_store_object'
 require 'tick/pathname'
+require 'tick/json_handler'
 require 'tick/repo'
 require 'tick/milestone'
 require 'tick/ticket'
