@@ -1,51 +1,28 @@
-require 'date'
-
 module Tick
-  Milestone = Struct.new(:repo, :name, :status, :description, :created_at,
+  Milestone = Struct.new(:parent, :name, :status, :description, :created_at,
                          :updated_at)
 
   # Milestone is a named collection of tickets
   class Milestone
-    include GitStoreObject
-    TYPES[:repo] = :skip
+    include GitStoreObject::InstanceMethods
+    extend GitStoreObject::SingletoneMethods
 
-    def self.create(repo, properties = {})
-      properties[:repo] = repo
-      values = properties.values_at(*members)
-      instance = new(*values)
-      instance.save
-      instance
+    PATH_PREFIX = "Milestone-"
+
+    alias repo parent
+
+    def generate_path
+      Tick::Pathname("#{PATH_PREFIX}#{sha1}")
     end
 
-    def self.open(repo, path)
-      tree = repo.store.tree(path)
-      instance = new(repo)
-
-      members.each do |member|
-        type = TYPES[member]
-        instance[member] = instance.parse(tree[member.to_s], type, member)
-      end
-
-      instance
-    end
-
-    attr_reader :path
-
-    def initialize(*args)
-      super
-
-      self.created_at ||= Time.now
-      self.updated_at ||= Time.now
-      @path = Tick::Pathname("Milestone-#{sha1}")
-    end
-
+    # This should be lazier...
     def tickets
-      milestone_tree = repo.store.tree(path)
+      milestone_tree = tree(path)
       tickets_tree = milestone_tree.tree(:tickets)
       tickets_path = path/:tickets
 
-      tickets_tree.table.keys.map do |key|
-        Ticket.open(self, tickets_path/key)
+      tickets_tree.table.map do |key, value|
+        Ticket.from(self, value)
       end
     end
 
@@ -64,7 +41,7 @@ module Tick
       path = self.path
 
       transaction 'Updating Milestone' do |store|
-        tree = store.tree(path)
+        tree = tree(path)
 
         self.class.members.each do |member|
           type = TYPES[member]
@@ -76,7 +53,7 @@ module Tick
     end
 
     def transaction(message)
-      store = repo.store
+      store = parent.store
       store.transaction(message){ yield(store) }
     ensure
       store.refresh!

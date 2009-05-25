@@ -1,41 +1,18 @@
 module Tick
-  Ticket = Struct.new(:milestone, :name, :status, :description, :created_at,
+  Ticket = Struct.new(:parent, :name, :status, :description, :created_at,
                       :updated_at, :tags, :author)
 
+  # Tickets contain issue descriptions
   class Ticket
-    include GitStoreObject
-    TYPES[:milestone] = :skip
+    include GitStoreObject::InstanceMethods
+    extend GitStoreObject::SingletoneMethods
 
-    def self.create(milestone, properties = {})
-      properties = properties.merge(:milestone => milestone)
-      values = properties.values_at(*members)
-      instance = new(*values)
-      instance.save
-      instance
-    end
+    PATH_PREFIX = "tickets/Ticket-"
 
-    def self.open(milestone, path)
-      tree = milestone.repo.store
-      instance = new(milestone)
+    alias milestone parent
 
-      members.each do |member|
-        type = TYPES[member]
-        next if type == :skip
-
-        value = tree[path/member]
-        instance[member] = instance.parse(value, type, member)
-      end
-
-      instance
-    end
-
-    attr_reader :path
-
-    def initialize(*args)
-      super
-
-      self.created_at ||= Time.now
-      @path = milestone.path/"tickets/Ticket-#{sha1}"
+    def generate_path
+      parent.path/"#{PATH_PREFIX}#{sha1}"
     end
 
     def update(hash = {})
@@ -50,8 +27,8 @@ module Tick
     def save
       self.updated_at = Time.now
 
-      milestone.transaction 'Updating Ticket' do |store|
-        milestone_tree = store.tree(milestone.path)
+      parent.transaction 'Updating Ticket' do |store|
+        milestone_tree = store.tree(parent.path)
         tickets_tree = milestone_tree.tree('tickets')
         ticket_tree = tickets_tree.tree(path.basename)
 
@@ -59,7 +36,7 @@ module Tick
           type = TYPES[member]
           next if type == :skip
 
-          ticket_tree[member.to_s] = dump(type, member)
+          ticket_tree[member] = dump(type, member)
         end
       end
 

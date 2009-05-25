@@ -16,8 +16,9 @@ module Tick
     end
 
     def milestones
-      store.root.table.keys.map do |key|
-        Milestone.open(self, key)
+      tree = store.root
+      tree.table.keys.map do |key|
+        Milestone.open(self, tree, key)
       end
     end
 
@@ -33,6 +34,10 @@ module Tick
       @store.commit(message)
     ensure
       @store.refresh!
+    end
+
+    def tree(*args)
+      store.tree(*args)
     end
   end
 end
