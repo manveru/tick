@@ -74,7 +74,6 @@ module Tick
         # p :dump => [type, member]
         case type
         when :string; {member => self[member].to_s}
-        when :date;   {member => self[member].to_s}
         when :time;   {member => self[member].to_i}
         when :set;    [*self[member]].uniq.sort
         else
@@ -86,7 +85,6 @@ module Tick
         # p :parse => [json, type, member]
         case type
         when :string; json[member.to_s]
-        when :date;   Date.parse(json[member.to_s])
         when :time;   Time.at(json[member.to_s])
         when :set;    Set.new(json)
         else
