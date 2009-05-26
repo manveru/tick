@@ -56,8 +56,16 @@ module Tick
       end
 
       def update(hash = {})
-        hash.each{|key, value| self[key] = value }
-        save
+        changes = false
+
+        self.class.members.each do |member|
+          value = hash[member.to_sym] || hash[member.to_s]
+          next if value.nil? or self[member] == value
+          changes = true
+          self[member] = value
+        end
+
+        save if changes
       end
 
       def inspect
