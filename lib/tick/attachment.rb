@@ -8,7 +8,7 @@ module Tick
     alias ticket parent
 
     def generate_path
-      @path = parent.path/"attachments/Attachment-#{sha1}"
+      self.path = parent.path/"attachments/Attachment-#{sha1}"
     end
 
     def save

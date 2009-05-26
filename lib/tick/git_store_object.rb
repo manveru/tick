@@ -1,5 +1,5 @@
 module Tick
-  COMMON_MEMBERS = [:parent, :created_at, :updated_at]
+  COMMON_MEMBERS = [:parent, :path, :created_at, :updated_at]
 
   # This module contains the methods used by all our so-called git store objects.
   # The classes using them will have to implement the `#save` and
@@ -15,8 +15,8 @@ module Tick
         instance
       end
 
-      def from(parent, hash)
-        instance = new(parent)
+      def from(parent, path, hash)
+        instance = new(parent, path)
         types = instance.class::TYPES
 
         members.each do |member|
@@ -28,7 +28,6 @@ module Tick
           instance[member] = instance.parse(value, type, member)
         end
 
-        instance.generate_path
         instance
       end
     end
@@ -37,12 +36,11 @@ module Tick
       TYPES = {
         :created_at => :time,
         :updated_at => :time,
+        :path => :skip,
         :parent => :skip,
       }
 
       TYPES.default = :string
-
-      attr_reader :path, :parent
 
       def initialize(*args)
         super

@@ -22,7 +22,7 @@ module Tick
 
     def milestones
       store.root.table.map do |key, value|
-        Milestone.from(self, value)
+        Milestone.from(self, Tick::Pathname(key), value)
       end
     end
 

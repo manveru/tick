@@ -9,7 +9,7 @@ module Tick
     alias repo parent
 
     def generate_path
-      @path = Tick::Pathname("Milestone-#{sha1}")
+      self.path = Tick::Pathname("Milestone-#{sha1}")
     end
 
     # This should be lazier...
@@ -19,7 +19,7 @@ module Tick
       tickets_path = path/:tickets
 
       tickets_tree.table.map do |key, value|
-        Ticket.from(self, value)
+        Ticket.from(self, tickets_path/key, value)
       end
     end
 

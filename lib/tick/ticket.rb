@@ -22,7 +22,7 @@ module Tick
     alias milestone parent
 
     def generate_path
-      @path = parent.path/"tickets/Ticket-#{sha1}"
+      self.path = parent.path/"tickets/Ticket-#{sha1}"
     end
 
     def save
@@ -45,7 +45,7 @@ module Tick
       comments_path = path/:comments
 
       comments_tree.table.map do |key, value|
-        Comment.from(self, value)
+        Comment.from(self, comments_path/key, value)
       end
     end
 
@@ -59,7 +59,7 @@ module Tick
       attachments_path = path/:attachments
 
       attachments_tree.table.map do |key, value|
-        Attachment.from(self, value)
+        Attachment.from(self, attachments_path/key, value)
       end
     end
 
