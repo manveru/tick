@@ -75,6 +75,14 @@ module Tick
         Digest::SHA1.hexdigest(id.inspect)
       end
 
+      def tick_id
+        path.basename.to_s.split('-').last[0..6]
+      end
+
+      def tick_name
+        "#{name} (#{tick_id})"
+      end
+
       def dump(value, type, member)
         case type
         when :string; {member => value.to_s}
