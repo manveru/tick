@@ -56,7 +56,7 @@ author: <%= author %>
   def create_ticket(bin, io)
     properties = parse_ticket(io)
     ticket = bin.repo.milestone.create_ticket(properties)
-    pp ticket
+    puts "Created ticket: #{ticket.tick_name}"
   end
 
   def parse_ticket(io)
