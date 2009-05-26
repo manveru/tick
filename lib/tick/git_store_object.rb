@@ -97,7 +97,7 @@ module Tick
         case type
         when :string; json[member.to_s]
         when :time;   Time.at(json[member.to_s])
-        when :set;    Set.new(json)
+        when :set;    [*json].flatten.uniq.sort
         else
           raise("Unknown type for %p: %p" % [member, type])
         end
