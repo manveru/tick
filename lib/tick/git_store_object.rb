@@ -136,7 +136,7 @@ module Tick
           value = self[member]
           next if value.nil?
 
-          tree[member] = dump(value, type, member)
+          tree[member.to_s] = dump(value, type, member)
         end
       end
     end

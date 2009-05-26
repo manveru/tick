@@ -41,3 +41,20 @@ module Tick
     Tick::Pathname.new(path.to_s)
   end
 end
+
+# apply some fixes to work on 1.9
+class GitStore
+  if 'String'.respond_to?(:ord)
+    def legacy_loose_object?(buf)
+      word = (buf[0].ord << 8) + buf[1].ord
+
+      buf[0] == ?x && word % 31 == 0
+    end
+  else
+    def legacy_loose_object?(buf)
+      word = (buf[0] << 8) + buf[1]
+
+      buf[0] == ?x && word % 31 == 0
+    end
+  end
+end
