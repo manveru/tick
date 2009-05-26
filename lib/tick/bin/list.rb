@@ -21,26 +21,43 @@ SYNOPSIS
   end
 
   def list_all(bin)
+    bin.repo.milestones.each do |milestone|
+      print_milestone(milestone)
+
+      milestone.tickets.each do |ticket|
+        print_ticket(ticket)
+      end
+    end
+
     exit
   end
 
   def list_status(bin, status)
     bin.repo.milestones.each do |milestone|
-      puts "Milestone: #{milestone.tick_name}"
+      print_milestone(milestone)
 
       milestone.tickets.each do |ticket|
-        puts "  Ticket: #{ticket.tick_name}"
-        ticket.class.members[1..-1].each do |member|
-          case member
-          when :tags, 'tags'
-            puts "    #{member}: #{[*ticket[member]].join(', ')}"
-          else
-            puts "    #{member}: #{ticket[member]}"
-          end
-        end
+        next unless ticket.status == status
+        print_ticket(ticket)
       end
     end
 
     exit
+  end
+
+  def print_milestone(milestone)
+    puts "Milestone: #{milestone.tick_name}"
+  end
+
+  def print_ticket(ticket)
+    puts "  Ticket: #{ticket.tick_name}"
+    ticket.class.members[1..-1].each do |member|
+      case member
+      when :tags, 'tags'
+        puts "    #{member}: #{[*ticket[member]].join(', ')}"
+      else
+        puts "    #{member}: #{ticket[member]}"
+      end
+    end
   end
 end
