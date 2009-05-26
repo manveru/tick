@@ -2,9 +2,9 @@ module Tick
   class Repo
     attr_reader :path, :branch, :store
 
-    def initialize(path, branch = 'tick')
+    def initialize(path, branch = 'tick', bare = false)
       @path, @branch = path, branch
-      @store = GitStore.new(path.to_s, branch, bare = true)
+      @store = GitStore.new(path.to_s, branch, bare)
       @store.handler.default = JSONHandler.new
       @store.refresh! # make sure we have latest data
     end

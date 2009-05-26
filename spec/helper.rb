@@ -12,7 +12,7 @@ shared :tick do
       Tick.git_init(@path, 'tick spec init')
       # use the local variable or we will only delete the most recent
       at_exit{ path.rm_rf }
-      @tick = Tick.open(@path, @branch)
+      @tick = Tick.open(@path, @branch, bare = true)
     end
 
     @tick

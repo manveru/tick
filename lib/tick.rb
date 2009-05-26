@@ -27,14 +27,15 @@ module Tick
   module_function
 
   # TODO: create repo without relying on git?
-  def git_init(path, message = 'tick init')
+  def git_init(path)
     ENV['GIT_DIR'] = path.to_s
     system('git', 'init', '--bare', '--quiet') || return
   end
 
-  def open(path, branch)
-    Repo.new(path, branch)
+  def open(path, branch, bare = false)
+    Repo.new(path, branch, bare)
   end
+  alias Repo open
 
   def Pathname(path)
     Tick::Pathname.new(path.to_s)
