@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+begin
+  require 'tick'
+rescue LoadError
+  require 'pathname'
+  file = Pathname(__FILE__)
+  file = file.readlink if file.symlink?
+  require file.join('../../lib/tick')
+end
+
+require 'tick/bin'
+
+Tick::Bin.new(ARGV).run
