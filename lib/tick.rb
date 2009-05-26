@@ -20,6 +20,7 @@ require 'tick/milestone'
 require 'tick/ticket'
 
 module Tick
+  autoload :VERSION, 'tick/version'
   autoload :Comment, 'tick/comment'
   autoload :Attachment, 'tick/attachment'
 
