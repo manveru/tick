@@ -15,11 +15,7 @@ module Tick
       self.updated_at = Time.now
 
       parent.transaction 'Updating Comment' do |store|
-        ticket_tree = store.tree(parent.path)
-        comments_tree = ticket_tree.tree(:comments)
-        comment_tree = comments_tree.tree(path.basename)
-
-        dump_into(comment_tree)
+        dump_into(object_tree('comments'))
       end
 
       self

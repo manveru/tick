@@ -14,13 +14,7 @@ module Tick
 
     # This should be lazier...
     def tickets
-      milestone_tree = tree(path)
-      tickets_tree = milestone_tree.tree(:tickets)
-      tickets_path = path/:tickets
-
-      tickets_tree.table.map do |key, value|
-        Ticket.from(self, tickets_path/key, value)
-      end
+      subtree_map(Ticket, :tickets)
     end
 
     def create_ticket(*args)
@@ -37,7 +31,7 @@ module Tick
       self.updated_at = Time.now
 
       transaction 'Updating Milestone' do |store|
-        dump_into(tree(path))
+        dump_into(tree(path.to_s))
       end
 
       self

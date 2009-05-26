@@ -19,7 +19,7 @@ module Tick
         attachments_tree = ticket_tree.tree(:attachments)
         attachment_tree = attachments_tree.tree(path.basename)
 
-        dump_into(attachment_tree)
+        dump_into(object_tree('attachments'))
       end
 
       self

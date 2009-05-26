@@ -126,6 +126,21 @@ module Tick
         parent.store
       end
 
+      def object_tree(name)
+        parent_tree = store.tree(parent.path.to_s)
+        collection_tree = parent_tree.tree(name.to_s)
+        collection_tree.tree(path.basename.to_s)
+      end
+
+      def subtree_map(klass, name)
+        sub_tree = tree(path.to_s).tree(name.to_s)
+        sub_path = path/name.to_s
+
+        sub_tree.table.map do |key, value|
+          klass.from(self, sub_path/key, value)
+        end
+      end
+
       def dump_into(tree)
         types = self.class::TYPES
 

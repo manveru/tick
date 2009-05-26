@@ -29,24 +29,14 @@ module Tick
       self.updated_at = Time.now
 
       parent.transaction 'Updating Ticket' do |store|
-        milestone_tree = store.tree(parent.path)
-        tickets_tree = milestone_tree.tree('tickets')
-        ticket_tree = tickets_tree.tree(path.basename)
-
-        dump_into(ticket_tree)
+        dump_into(object_tree('tickets'))
       end
 
       self
     end
 
     def comments
-      ticket_tree = tree(path)
-      comments_tree = ticket_tree.tree(:comments)
-      comments_path = path/:comments
-
-      comments_tree.table.map do |key, value|
-        Comment.from(self, comments_path/key, value)
-      end
+      subtree_map(Comment, :comments)
     end
 
     def create_comment(*args)
@@ -54,13 +44,7 @@ module Tick
     end
 
     def attachments
-      ticket_tree = tree(path)
-      attachments_tree = ticket_tree.tree(:attachments)
-      attachments_path = path/:attachments
-
-      attachments_tree.table.map do |key, value|
-        Attachment.from(self, attachments_path/key, value)
-      end
+      subtree_map(Attachment, :attachments)
     end
 
     def create_attachment(*args)
