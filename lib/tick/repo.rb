@@ -11,8 +11,13 @@ module Tick
 
     def sanitize!
       # make sure we have a future milestone
-      milestone = Milestone.new(:name => 'future')
-      FileUtils.mkdir_p(File.join(path, 'future'))
+      Milestone.create(self, :name => 'future')
+    end
+
+    # The milestone that was last updated.
+    # If none was here yet, we create the future milestone.
+    def milestone
+      milestones.sort_by{|m| m.updated_at }.last || sanitize!
     end
 
     def milestones
