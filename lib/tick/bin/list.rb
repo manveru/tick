@@ -14,6 +14,8 @@ SYNOPSIS
            'Show all tickets'){|v| list_all(bin) }
     bin.on('-s', '--status STATUS',
            'Show tickets by status'){|v| list_status(bin, v) }
+    bin.on('-t', '--tags tag1,tag2,...', Array,
+           'Show tickets with these tags'){|v| list_tags(bin, *v) }
   end
 
   def run(bin, options)
@@ -38,6 +40,19 @@ SYNOPSIS
 
       milestone.tickets.each do |ticket|
         next unless ticket.status == status
+        print_ticket(ticket)
+      end
+    end
+
+    exit
+  end
+
+  def list_tags(bin, *tags)
+    bin.repo.milestones.each do |milestone|
+      print_milestone(milestone)
+
+      milestone.tickets.each do |ticket|
+        next if (ticket.tags & tags).empty?
         print_ticket(ticket)
       end
     end

@@ -5,6 +5,10 @@ module Tick::Bin::Set
 
   def parser(bin, opt)
     bin.on('-s', '--status STATUS'){|v| opt[:status] = v }
+    bin.on('-n', '--name STRING'){|v| opt[:name] = v }
+    bin.on('-d', '--description STRING'){|v| opt[:description] = v }
+    bin.on('-t', '--tags tag1,tag2,...', Array){|v| opt[:tags] = v }
+    bin.on('-a', '--author STRING'){|v| opt[:author] = v }
   end
 
   def run(bin, options)
