@@ -12,8 +12,10 @@ module Tick::Bin::Set
       bin.repo.milestones.each do |milestone|
         milestone.tickets.each do |ticket|
           next unless tick_id == ticket.tick_id
-          ticket.update(options)
-          p :updated
+
+          if ticket.update(options)
+            puts "Updated #{ticket.tick_name}"
+          end
         end
       end
 
