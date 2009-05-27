@@ -225,4 +225,10 @@ describe Tick::Ticket do
       ticket.attachments.size.should == 2
     end
   end
+
+  it 'has a description' do
+    milestone = tick.create_milestone(name: 'descriptions')
+    ticket = milestone.create_ticket(name: 'ticket', description: 'yay')
+    ticket.description.should == 'yay'
+  end
 end

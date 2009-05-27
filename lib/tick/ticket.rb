@@ -1,5 +1,5 @@
 module Tick
-  Ticket = Struct.new(*COMMON_MEMBERS, :name, :status, :descriptions, :tags, :author)
+  Ticket = Struct.new(*COMMON_MEMBERS, :name, :status, :description, :tags, :author)
 
   # Tickets contain issue descriptions.
   #
